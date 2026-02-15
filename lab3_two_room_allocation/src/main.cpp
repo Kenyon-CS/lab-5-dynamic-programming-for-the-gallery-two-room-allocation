@@ -87,17 +87,17 @@ int main(int argc, char** argv) {
     std::cout << "Optimal value: " << dp[CA][CB] << "\n\n";
 
     // Reconstruct assignments via backtracking
-    std::vector<std::string> assignment(n, "not shown");
+    std::vector<std::string> assignment(n, "Skip");
     int curr_a = CA;
     int curr_b = CB;
 
     for (int i = n - 1; i >= 0; i--) {
         int choice = choices[i][curr_a][curr_b];
         if (choice == 1) { // Room A
-            assignment[i] = "Room A";
+            assignment[i] = "A";
             curr_a -= items[i].width;
         } else if (choice == 2) { // Room B
-            assignment[i] = "Room B";
+            assignment[i] = "B";
             curr_b -= items[i].width;
         }
     }
