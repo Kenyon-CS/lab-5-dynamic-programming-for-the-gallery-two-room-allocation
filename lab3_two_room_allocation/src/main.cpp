@@ -49,6 +49,63 @@ int main(int argc, char** argv) {
     // next = dp; then consider placing item in A or B.
     // ============================
 
+    std::vector<std::vector<std::vector<int>>> choices(n, std::vector<std::vector<int>>(CA + 1, std::vector<int>(CB + 1, 0)));
+
+    for (int i = 0; i < n; i++) {
+        // Create a copy of current DP
+        std::vector<std::vector<int>> next_dp = dp;
+        int w = items[i].width;
+        int v = items[i].value;
+
+        for (int a = 0; a <= CA; a++) {
+            for (int b = 0; b <= CB; b++) {
+                // Option 1: Skip (Already in next_dp[a][b] from the copy)
+                choices[i][a][b] = 0; 
+
+                // Option 2: Place in Room A
+                if (a >= w) {
+                    int val_A = dp[a - w][b] + v;
+                    if (val_A > next_dp[a][b]) {
+                        next_dp[a][b] = val_A;
+                        choices[i][a][b] = 1;
+                    }
+                }
+
+                // Option 3: Place in Room B
+                if (b >= w) {
+                    int val_B = dp[a][b - w] + v;
+                    if (val_B > next_dp[a][b]) {
+                        next_dp[a][b] = val_B;
+                        choices[i][a][b] = 2;
+                    }
+                }
+            }
+        }
+        dp = next_dp; // Move to the DP for next item
+    }
+
+    std::cout << "Optimal value: " << dp[CA][CB] << "\n\n";
+
+    // Reconstruct assignments via backtracking
+    std::vector<std::string> assignment(n, "not shown");
+    int curr_a = CA;
+    int curr_b = CB;
+
+    for (int i = n - 1; i >= 0; i--) {
+        int choice = choices[i][curr_a][curr_b];
+        if (choice == 1) { // Room A
+            assignment[i] = "Room A";
+            curr_a -= items[i].width;
+        } else if (choice == 2) { // Room B
+            assignment[i] = "Room B";
+            curr_b -= items[i].width;
+        }
+    }
+
+    std::cout << "Assignments:\n";
+    for (int i = 0; i < n; i++) {
+        std::cout << "  " << std::setw(8) << items[i].name << ": " << assignment[i] << "\n";
+    }
     std::cout << "TODO: compute optimal value dp[CA][CB] and reconstruct assignments.\n";
 
     // For small capacities, print dp grid (currently zeros)
